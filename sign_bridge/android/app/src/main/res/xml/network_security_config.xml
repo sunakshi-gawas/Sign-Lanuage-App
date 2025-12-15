@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Your Mac local IP used by the phone -->
+        <domain>172.20.10.10</domain>
+
+        <!-- Emulator localhost, if you ever use it -->
+        <domain>10.0.2.2</domain>
+    </domain-config>
+</network-security-config>
