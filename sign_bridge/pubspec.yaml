@@ -38,6 +38,7 @@ dependencies:
   provider: ^6.1.0     # Or Riverpod/BLoC
   flutter_tts: ^4.0.2  # If you do TTS on device
   url_launcher: ^6.3.0
+  connectivity_plus: ^6.0.3  # For network status detection
   # For showing Web-based avatar (three.js / Sign-Kit)
   webview_flutter: ^4.10.0
 

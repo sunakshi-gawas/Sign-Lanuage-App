@@ -18,32 +18,36 @@ Cross-platform mobile application for real-time sign language recognition and tr
 ## 🎯 Overview
 
 SignVerse AI is a real-time sign language recognition app that:
-- Captures video from device camera
+
+- Captures video from device camera (front/back toggle)
 - Extracts hand landmarks using MediaPipe
 - Sends to backend for sign recognition
-- Displays recognized signs with animations
-- Provides text-to-sign translation
-- Offers text-to-speech for accessibility
-- Works offline with cached models
-- Supports 11+ sign languages
+- Displays recognized signs with confidence scores
+- Provides text-to-sign translation with GIF animations
+- Shows real-time online/offline network status
+- Features modern purple & orange themed UI
+- Supports 9 sign gestures
 
 ### Target Platforms
+
 - **Android**: 5.0+ (API 21+)
 - **iOS**: 12.0+
 - **Web**: Modern browsers (Chrome, Safari, Firefox)
 
 ### Key Technologies
-- **Framework**: Flutter 3.13+
-- **Language**: Dart
-- **State Management**: Provider
-- **Backend Communication**: HTTP, WebSocket
-- **Camera**: Camera plugin
-- **ML Integration**: MediaPipe (via backend)
-- **UI**: Material Design 3
+
+- **Framework**: Flutter 3.10+
+- **Language**: Dart 3.10+
+- **State Management**: Provider 6.1.0
+- **Backend Communication**: HTTP
+- **Camera**: Camera plugin 0.11.0
+- **Network Detection**: connectivity_plus
+- **UI**: Material Design 3 with custom theming
 
 ## ✨ Features
 
 ### Core Features
+
 - 📹 **Real-time Camera Capture** - Live video feed from device
 - 🤖 **AI Sign Recognition** - ML-powered hand pose detection
 - 🎯 **Gesture Recognition** - Multi-frame sign detection
@@ -57,6 +61,7 @@ SignVerse AI is a real-time sign language recognition app that:
 - 🎬 **Video Playback** - Recorded sign demonstrations
 
 ### User Interface
+
 - Clean, intuitive Material Design 3
 - Bottom navigation for feature access
 - Real-time camera preview with overlay
@@ -67,104 +72,87 @@ SignVerse AI is a real-time sign language recognition app that:
 ## 💻 Tech Stack
 
 ### Frontend Framework
+
 - **Flutter** (3.13+) - Multi-platform mobile development
-- **Dart** - Programming language
-- **Material Design 3** - UI components and design system
+- **Dart** (3.10+) - Programming language
+- **Material Design 3** - UI components with custom theming
 
 ### State Management
-- **Provider** (6.1.0+) - Simple, powerful state management
-- Alternatives: Riverpod, BLoC (can be swapped)
+
+- **Provider** (6.1.0) - Simple, powerful state management
 
 ### Networking
-- **HTTP** (1.2.0+) - REST API communication
-- **WebSocket** (optional) - Real-time bidirectional communication
-- **URL Launcher** (6.3.0+) - Deep linking and external URLs
+
+- **HTTP** (1.2.0) - REST API communication
+- **connectivity_plus** (6.0.3) - Real-time network status detection
+- **URL Launcher** (6.3.0) - External URLs
 
 ### Camera & Media
-- **Camera** (0.11.0+) - Device camera access
-- **Video Player** (2.9.1+) - Video playback
-- **Permission Handler** (11.3.0+) - Runtime permissions
-- **Image Picker** (optional) - Gallery image selection
 
-### ML & Processing
-- **MediaPipe** (via backend) - Hand landmark detection
-- **TensorFlow** (inference via backend) - Sign classification
+- **Camera** (0.11.0) - Device camera access with front/back toggle
+- **Video Player** (2.9.1) - Video playback
+- **Permission Handler** (11.3.0) - Runtime permissions
 
 ### Accessibility & User Experience
-- **Flutter TTS** (4.0.2+) - Text-to-speech functionality
-- **Cupertino Icons** (1.0.8+) - iOS-style icons
-- **WebView Flutter** (4.10.0+) - Embedded web content
+
+- **Flutter TTS** (4.0.2) - Text-to-speech functionality
+- **Cupertino Icons** (1.0.8) - iOS-style icons
+- **WebView Flutter** (4.10.0) - Embedded web content
 
 ### Development Tools
-- **Flutter Launcher Icons** (0.14.4+) - App icon generation
-- **Dart Analysis** - Code linting and analysis
+
+- **Flutter Launcher Icons** (0.14.4) - App icon generation
+- **Flutter Lints** - Code analysis
 
 ## 📁 Directory Structure
 
 ```
 sign_bridge/
 │
-├── 📚 Documentation
-│   ├── README.md                  # This file
-│   ├── ARCHITECTURE.md            # App architecture & patterns
-│   ├── DEVELOPMENT.md             # Development guide
-│   └── BUILD.md                   # Build & release guide
-│
-├── 🎨 UI & Assets
-│   ├── assets/                    # Images, icons, GIFs, fonts
-│   │   ├── icons/
-│   │   ├── images/
-│   │   ├── gifs/
-│   │   └── fonts/
+├── lib/                           # Dart source code
+│   ├── main.dart                  # App entry point & providers
 │   │
-│   ├── lib/
-│   │   ├── main.dart              # App entry point
-│   │   ├── widgets/               # Reusable UI widgets
-│   │   ├── screens/               # Full screen pages
-│   │   │   ├── home_screen.dart
-│   │   │   ├── camera_screen.dart
-│   │   │   ├── translate_screen.dart
-│   │   │   ├── history_screen.dart
-│   │   │   └── settings_screen.dart
-│   │   └── services/              # API & business logic
-│   │       ├── api_service.dart
-│   │       ├── ml_service.dart
-│   │       ├── camera_service.dart
-│   │       ├── storage_service.dart
-│   │       └── notification_service.dart
-│
-├── 🔧 Configuration
-│   ├── pubspec.yaml               # Dependencies
-│   ├── pubspec.lock               # Locked versions
-│   ├── analysis_options.yaml      # Lint rules
-│   ├── .gitignore                 # Git ignore patterns
-│   └── .env                       # Environment variables
-│
-├── 🏗️ Platform-Specific
-│   ├── android/                   # Android native code
-│   │   ├── app/
-│   │   ├── build.gradle
-│   │   └── AndroidManifest.xml
+│   ├── screens/                   # Full screen pages
+│   │   ├── home_screen.dart       # Main dashboard with online status
+│   │   ├── sign_to_text_screen_v2.dart  # Camera-based sign detection
+│   │   └── text_to_sign_screen.dart     # Text to GIF translation
 │   │
-│   ├── ios/                       # iOS native code
-│   │   ├── Runner/
-│   │   ├── Podfile
-│   │   └── Info.plist
+│   ├── services/                  # API & business logic
+│   │   ├── api_client.dart        # HTTP client for backend
+│   │   └── server_discovery.dart  # Auto-discover server IP
 │   │
-│   ├── web/                       # Web platform
-│   │   ├── index.html
-│   │   └── manifest.json
+│   ├── theme/                     # App theming
+│   │   └── app_theme.dart         # Purple/orange color scheme
 │   │
-│   ├── linux/                     # Linux platform
-│   ├── macos/                     # macOS platform
-│   └── windows/                   # Windows platform
+│   └── widgets/                   # Reusable UI widgets
+│       └── rounded_button.dart    # Custom button component
 │
-├── 🧪 Testing
-│   └── test/
-│       └── widget_test.dart
+├── assets/                        # Static assets
+│   └── logo.png                   # App logo
 │
-└── 📦 Build Output
-    └── build/
+├── android/                       # Android native code
+│   ├── app/build.gradle.kts
+│   └── ...
+│
+├── ios/                           # iOS native code
+│   ├── Runner/
+│   └── ...
+│
+├── web/                           # Web platform
+│   ├── index.html
+│   └── manifest.json
+│
+├── linux/                         # Linux platform
+├── macos/                         # macOS platform
+├── windows/                       # Windows platform
+│
+├── test/                          # Unit & widget tests
+│   └── widget_test.dart
+│
+├── pubspec.yaml                   # Dependencies
+├── pubspec.lock                   # Locked versions
+├── analysis_options.yaml          # Lint rules
+└── README.md                      # This file
 ```
 
 ## 🚀 Setup & Installation
@@ -186,6 +174,7 @@ sign_bridge/
 ### Quick Start
 
 **1. Get Flutter**
+
 ```bash
 # Install Flutter from https://flutter.dev/docs/get-started/install
 # Or update existing installation
@@ -193,16 +182,19 @@ flutter upgrade
 ```
 
 **2. Navigate to App Directory**
+
 ```bash
 cd sign_bridge
 ```
 
 **3. Get Dependencies**
+
 ```bash
 flutter pub get
 ```
 
 **4. Run App (Development)**
+
 ```bash
 # List available devices
 flutter devices
@@ -217,6 +209,7 @@ flutter run -d <device-id>
 ### Manual Setup (Detailed)
 
 **For Android:**
+
 ```bash
 cd sign_bridge
 
@@ -228,6 +221,7 @@ flutter run -d android
 ```
 
 **For iOS:**
+
 ```bash
 cd sign_bridge
 
@@ -244,6 +238,7 @@ flutter run -d ios
 ```
 
 **For Web:**
+
 ```bash
 cd sign_bridge
 
@@ -351,50 +346,62 @@ flutter run -- --enable-tts
 ### State Management (Provider)
 
 ```dart
-// Define providers
-final signProvider = Provider<String>((ref) => "");
-final translationProvider = StateNotifierProvider<TranslationNotifier, String>(
-  (ref) => TranslationNotifier(),
+// Define a ChangeNotifier for app state
+class TranslationNotifier extends ChangeNotifier {
+  String _text = "";
+  String get text => _text;
+
+  void setText(String value) {
+    _text = value;
+    notifyListeners();
+  }
+}
+
+// Provide it at app root (in main.dart)
+MultiProvider(
+  providers: [
+    ChangeNotifierProvider(create: (_) => TranslationNotifier()),
+  ],
+  child: const MyApp(),
 );
 
-// Use in widgets
+// Consume in widgets
 @override
-Widget build(BuildContext context, WidgetRef ref) {
-  final sign = ref.watch(signProvider);
-  return Text(sign);
+Widget build(BuildContext context) {
+  final text = context.watch<TranslationNotifier>().text;
+  return Text(text);
 }
 ```
 
 ## 📱 Features Guide
 
-### 1. Real-Time Camera Screen
-- Displays live camera feed
-- Shows detected hand landmarks
-- Displays current sign with confidence
-- Real-time feedback with haptics
-- Confidence threshold indicator
+### 1. Home Screen (`home_screen.dart`)
 
-### 2. Text-to-Sign Translation
-- Enter text to translate
-- View animated sign sequence
-- Play audio (TTS)
-- Save to history
-- Share translations
+- App logo and branding
+- Real-time online/offline status indicator
+- Feature cards for navigation
+- Purple & orange gradient hero section
+- Quick access to Sign-to-Text and Text-to-Sign
 
-### 3. Translation History
-- View past translations
-- Search and filter
-- Delete individual entries
-- Export history
-- Offline access
+### 2. Sign to Text (`sign_to_text_screen_v2.dart`)
 
-### 4. Settings
-- API endpoint configuration
-- Confidence threshold adjustment
-- Language selection
-- Theme (Dark/Light)
-- TTS settings
-- Permission management
+- Live camera feed with aspect ratio correction
+- Front/back camera toggle button
+- Real-time hand landmark detection
+- Sign prediction with confidence percentage
+- Unknown gesture handling (< 70% confidence)
+- Gradient purple border around camera
+- Settings dialog for camera options
+
+### 3. Text to Sign (`text_to_sign_screen.dart`)
+
+- Text input with orange-themed styling
+- Convert button with gradient design
+- Animated GIF display for signs
+- Token display showing parsed signs
+- Navigation controls (prev/next)
+- Page indicators for multiple signs
+- Empty state with instructions
 
 ## 🔨 Building for Release
 
@@ -445,6 +452,7 @@ flutter build web --release
 ### Setup Issues
 
 **Flutter not found**
+
 ```bash
 # Add Flutter to PATH
 export PATH="$PATH:/path/to/flutter/bin"
@@ -454,6 +462,7 @@ flutter doctor
 ```
 
 **Pub get fails**
+
 ```bash
 # Clear pub cache
 flutter pub cache clean
@@ -465,6 +474,7 @@ flutter pub get
 ### Runtime Issues
 
 **Camera permission denied**
+
 ```
 Solution: Check permissions in settings
 - Android: Settings > Permissions
@@ -472,14 +482,16 @@ Solution: Check permissions in settings
 ```
 
 **Connection to backend fails**
+
 ```
 Solution: Ensure backend servers are running
-- Backend: python3 start_servers.py
+- Backend: py -3.11 start_servers.py
 - Check network connectivity
 - Verify API endpoint in settings
 ```
 
 **Slow performance on older devices**
+
 ```
 Solutions:
 - Use lower camera resolution
@@ -489,12 +501,12 @@ Solutions:
 
 ### Common Errors
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| "SDK constraints" | Flutter version mismatch | `flutter upgrade` |
-| "Pod install" fails | CocoaPods issue (iOS) | `flutter clean && flutter pub get` |
-| "Build failed" | Gradle/Xcode error | `flutter clean` |
-| "No devices found" | No emulator/device running | `flutter devices` |
+| Error               | Cause                      | Solution                           |
+| ------------------- | -------------------------- | ---------------------------------- |
+| "SDK constraints"   | Flutter version mismatch   | `flutter upgrade`                  |
+| "Pod install" fails | CocoaPods issue (iOS)      | `flutter clean && flutter pub get` |
+| "Build failed"      | Gradle/Xcode error         | `flutter clean`                    |
+| "No devices found"  | No emulator/device running | `flutter devices`                  |
 
 ## 📚 Additional Resources
 
@@ -525,6 +537,7 @@ MIT License - See [../LICENSE](../LICENSE)
 
 ---
 
-**Last Updated**: December 15, 2025  
+**Last Updated**: December 16, 2025  
 **Flutter Version**: 3.13+  
-**Dart Version**: 3.10+
+**Dart Version**: 3.10+  
+**Maintainer**: XXXXXXXXX

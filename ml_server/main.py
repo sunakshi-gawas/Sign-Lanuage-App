@@ -79,6 +79,17 @@ async def root():
     }
 
 
+# Confidence threshold - below this, return "Unknown"
+CONFIDENCE_THRESHOLD = 0.70  # 70% confidence required
+
+# Messages for unknown signs
+UNKNOWN_MESSAGES = [
+    "I didn't understand that sign",
+    "Unknown sign - please try again",
+    "Sign not recognized",
+]
+
+
 @app.post("/api/predict", response_model=PredictionResponse)
 async def predict(req: FeaturesRequest):
     features = req.features
@@ -97,7 +108,18 @@ async def predict(req: FeaturesRequest):
         probs = preds[0]
 
         idx = int(np.argmax(probs))
-        label = INDEX_TO_LABEL.get(idx, "UNKNOWN")
+        max_confidence = float(np.max(probs))
+        
+        # If confidence is below threshold, return Unknown
+        if max_confidence < CONFIDENCE_THRESHOLD:
+            label = "Unknown - I didn't understand that sign"
+            idx = -1
+        # If only one class and confidence not high enough for that class
+        elif NUM_CLASSES == 1 and max_confidence < 0.85:
+            label = "Unknown - sign not in my vocabulary"
+            idx = -1
+        else:
+            label = INDEX_TO_LABEL.get(idx, "UNKNOWN")
 
         return PredictionResponse(
             label=label,

@@ -6,7 +6,17 @@ import re
 
 import cv2
 import numpy as np
-import mediapipe as mp
+import cvzone
+from cvzone.HandTrackingModule import HandDetector
+
+HAND_DETECTOR_AVAILABLE = True
+try:
+    hand_detector = HandDetector(detectionCon=0.7, maxHands=1)
+    print("[INFO] Hand detector (cvzone) initialized successfully")
+except Exception as e:
+    print(f"[WARN] Hand detector initialization failed: {e}")
+    HAND_DETECTOR_AVAILABLE = False
+    hand_detector = None
 
 from .schemas import (
     SignToTextRequest,
@@ -51,14 +61,8 @@ app.add_middleware(
 
 classifier = SignClassifier()
 
-# ====================== MEDIAPIPE (Sign → Text) ======================
-
-mp_hands = mp.solutions.hands
-hands_detector = mp_hands.Hands(
-    static_image_mode=True,
-    max_num_hands=1,
-    min_detection_confidence=0.5,
-)
+# ====================== HAND DETECTION (Sign → Text) ======================
+# Using cvzone as a simpler alternative to MediaPipe for hand detection
 
 # ====================== HELPERS ======================
 
@@ -151,6 +155,13 @@ async def sign_to_text_image(request: Request):
     Supports language query parameter for translation.
     Usage: POST /api/sign-to-text-image?language=hi
     """
+    # Check if hand detector is available
+    if not HAND_DETECTOR_AVAILABLE or hand_detector is None:
+        return SignToTextResponse(
+            text="Hand detection not available. Detector initialization failed.",
+            confidence=0.0
+        )
+    
     # Get language from query parameters, default to English
     language = request.query_params.get("language", "en")
     
@@ -161,19 +172,26 @@ async def sign_to_text_image(request: Request):
     if img is None:
         return SignToTextResponse(text="Invalid image received.")
 
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img_rgb = cv2.flip(img_rgb, 1)
+    # Flip image for mirror effect
+    img = cv2.flip(img, 1)
 
-    results = hands_detector.process(img_rgb)
+    # Detect hands using cvzone
+    hands, img_with_hands = hand_detector.findHands(img, draw=False)
 
-    if not results.multi_hand_landmarks:
+    if not hands or len(hands) == 0:
         text = "No hand detected. Show your hand clearly."
         if language and language != "en":
             text = translate_text(text, language)
         return SignToTextResponse(text=text)
 
-    hand_landmarks = results.multi_hand_landmarks[0].landmark
-    landmarks = [(lm.x, lm.y, lm.z) for lm in hand_landmarks]
+    # Extract landmarks from first detected hand
+    # cvzone returns landmarks in pixel coordinates with 21 points
+    hand = hands[0]
+    lm_list = hand["lmList"]  # List of [x, y, z] for each landmark
+    
+    # Normalize landmarks to 0-1 range based on image dimensions
+    h, w = img.shape[:2]
+    landmarks = [(x/w, y/h, z/w) for x, y, z in lm_list]
 
     try:
         label, confidence = classifier.predict_from_landmarks(landmarks)
@@ -186,6 +204,8 @@ async def sign_to_text_image(request: Request):
         return SignToTextResponse(text=text, confidence=float(confidence))
     except Exception as e:
         print("[ERROR] sign_to_text_image:", e)
+        import traceback
+        traceback.print_exc()
         return SignToTextResponse(text=f"Recognition error: {e}", confidence=0.0)
 
 

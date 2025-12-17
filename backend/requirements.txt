@@ -1,10 +1,19 @@
-fastapi
-uvicorn[standard]
-pydantic
-python-multipart
-opencv-python
-numpy
-mediapipe
-gTTS
-requests
-tensorflow
+# Core dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+python-multipart==0.0.6
+
+# Data & ML - use pre-built wheels for Python 3.12
+numpy>=1.26.0
+opencv-python>=4.8.0
+mediapipe==0.10.14
+scikit-learn==1.8.0
+cvzone==1.6.1
+
+# API & networking  
+requests>=2.31.0
+anyio>=3.7.1
+
+# Optional features
+gTTS>=2.4.0

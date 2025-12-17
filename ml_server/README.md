@@ -1,6 +1,6 @@
 # ML Server - TensorFlow Model Inference
 
-High-performance TensorFlow model serving for real-time sign language recognition. This server handles neural network inference and returns sign predictions with confidence scores.
+High-performance TensorFlow/Keras model serving for real-time sign language recognition. This service performs neural network inference and returns sign predictions with probability scores.
 
 ## 📋 Table of Contents
 
@@ -18,6 +18,7 @@ High-performance TensorFlow model serving for real-time sign language recognitio
 ## 🎯 Overview
 
 The ML Server is a specialized FastAPI service that:
+
 - Loads pre-trained TensorFlow sign recognition models
 - Performs real-time neural network inference
 - Returns sign predictions with confidence scores
@@ -25,11 +26,12 @@ The ML Server is a specialized FastAPI service that:
 - Scales features using pre-fitted scalers
 
 ### Key Technologies
-- **Framework**: FastAPI (lightweight, async)
-- **ML Framework**: TensorFlow 2.12+
-- **Server**: Uvicorn
+
+- **Framework**: FastAPI 0.104.1
+- **ML Runtime**: TensorFlow 2.13.x (Keras)
+- **Server**: Uvicorn 0.24.0
 - **Data Processing**: NumPy, Scikit-learn
-- **Language**: Python 3.9+
+- **Language**: Python 3.11 (recommended)
 
 ## ✨ Features
 
@@ -48,44 +50,38 @@ The ML Server is a specialized FastAPI service that:
 ```
 ml_server/
 │
-├── 📚 Documentation
-│   ├── README.md                # This file
-│   ├── MODEL.md                 # Model details & training
-│   └── INFERENCE.md             # Inference guide
+├── main.py                      # FastAPI app & inference logic (uses Keras)
+├── requirements.txt             # Python dependencies (TensorFlow installed separately)
+├── README.md                    # This file
 │
-├── 🚀 Server Files
-│   ├── main.py                  # FastAPI app & inference logic
-│   └── run_server.sh            # Shell startup script
+├── model/                       # Trained model files
+│   ├── sign_model.h5            # Trained Keras model (~20MB)
+│   ├── scaler.pkl               # Feature normalization scaler
+│   └── label_map.json           # Sign class labels mapping
 │
-├── 🤖 Model Files
-│   └── model/
-│       ├── sign_model.h5        # Trained Keras model
-│       ├── scaler.pkl           # Feature scaler
-│       └── label_map.json       # Sign labels mapping
-│
-└── 🏗️ Virtual Environment
-    └── venv_infer/              # Inference environment
+└── venv_infer/                  # Python virtual environment
 ```
 
 ## 🚀 Setup & Installation
 
 ### Prerequisites
 
-- Python 3.9 or higher
+- Python 3.11 (Python 3.13 is not compatible with TensorFlow)
 - pip package manager
 - 1GB RAM minimum
 - 500MB disk space for models
 
 ### Quick Start
 
-Use the root startup script which handles everything:
+Use the root startup script which handles everything (Windows `cmd.exe`):
 
-```bash
-cd /path/to/Sign-Language
-python3 start_servers.py
+```bat
+cd d:\Sign-Language-App\Sign-Language-App
+py -3.11 start_servers.py
 ```
 
 This automatically:
+
 - Creates virtual environment if needed
 - Installs ML server dependencies
 - Starts ML server on port 8001
@@ -94,45 +90,52 @@ This automatically:
 ### Manual Setup
 
 **1. Create Virtual Environment**
-```bash
+
+```bat
 cd ml_server
-python3 -m venv venv_infer
-source venv_infer/bin/activate  # On Windows: venv_infer\Scripts\activate
+py -3.11 -m venv venv_infer
+venv_infer\Scripts\activate
 ```
 
 **2. Install Dependencies**
-```bash
+
+```bat
 pip install -r requirements.txt
+rem Install TensorFlow separately (choose appropriate build)
+pip install tensorflow==2.13.0
+rem On Apple Silicon: pip install tensorflow-macos==2.13.0
 ```
 
 **3. Verify Model Files**
-```bash
-ls -lh model/
-# Expected:
-# sign_model.h5    (~20MB)
-# scaler.pkl       (~5KB)
-# label_map.json   (~1KB)
+
+```bat
+dir model
+rem Expected:
+rem sign_model.h5    (~20MB)
+rem scaler.pkl       (~5KB)
+rem label_map.json   (~1KB)
 ```
 
 **4. Run Server**
-```bash
-python3 -m uvicorn main:app --host 0.0.0.0 --port 8001
+
+```bat
+py -3.11 -m uvicorn main:app --host 0.0.0.0 --port 8001
 ```
 
 ## 🏃 Running the Server
 
 ### Development Mode
 
-```bash
-python3 -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+```bat
+py -3.11 -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload
 ```
 
 The `--reload` flag enables hot-reload when code changes.
 
 ### Production Mode
 
-```bash
-python3 -m uvicorn main:app --host 0.0.0.0 --port 8001 --workers 4
+```bat
+py -3.11 -m uvicorn main:app --host 0.0.0.0 --port 8001 --workers 4
 ```
 
 ### Multiple Workers
@@ -140,22 +143,22 @@ python3 -m uvicorn main:app --host 0.0.0.0 --port 8001 --workers 4
 For better performance with multiple requests:
 
 ```bash
-python3 -m uvicorn main:app \
+python3.11 -m uvicorn main:app \
   --host 0.0.0.0 \
   --port 8001 \
-  --workers 4 \
-  --loop uvloop  # Optional: faster event loop
+  --workers 4
 ```
 
 ### Docker Deployment
 
 ```dockerfile
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt && \
+  pip install tensorflow==2.13.0
 
 COPY . .
 
@@ -164,119 +167,67 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
 
 ### Check Server Status
 
-```bash
-# Health check
-curl http://localhost:8001/health
+```bat
+rem Status (root)
+curl http://localhost:8001/
 
-# View API docs
-# Open: http://localhost:8001/docs
+rem View API docs
+rem Open: http://localhost:8001/docs
 ```
 
 ## 🔌 API Endpoints
 
-### Health Check
+### Status
+
 ```http
-GET /health
+GET /
 ```
 
-Returns server status and model information.
+Returns server status and list of classes.
 
-**Response:**
+**Response (example):**
+
 ```json
 {
   "status": "ok",
-  "model_loaded": true,
-  "model_version": "1.0",
-  "timestamp": "2025-12-15T10:30:00Z"
+  "message": "Sign ML inference server running",
+  "classes": {
+    "0": "BEST",
+    "1": "DISLIKE",
+    "2": "HELLO",
+    "3": "NO",
+    "4": "OK",
+    "5": "PEACE",
+    "6": "ROCK",
+    "7": "SORRY",
+    "8": "YES"
+  }
 }
 ```
 
 ### Sign Prediction
+
 ```http
-POST /predict
+POST /api/predict
 ```
 
-Performs sign recognition on input features.
+Performs sign recognition on a 63‑dim feature vector (flattened 21×3 landmarks). Features are scaled using the training scaler.
 
 **Request:**
+
 ```json
 {
-  "features": [
-    0.1, 0.2, 0.3, 0.4, 0.5,
-    0.6, 0.7, 0.8, 0.9, 1.0,
-    ...  // 63 total features (normalized)
-  ],
-  "confidence_threshold": 0.5
+  "features": [0.1, 0.2, 0.3, ...]
 }
 ```
 
 **Response:**
+
 ```json
 {
-  "predicted_sign": "HELLO",
-  "confidence": 0.9847,
-  "top_3_predictions": [
-    {"sign": "HELLO", "confidence": 0.9847},
-    {"sign": "YOU", "confidence": 0.0089},
-    {"sign": "THANK", "confidence": 0.0045}
-  ],
-  "inference_time_ms": 23,
-  "timestamp": "2025-12-15T10:30:15Z"
-}
-```
-
-### Batch Prediction
-```http
-POST /predict-batch
-```
-
-Process multiple samples efficiently.
-
-**Request:**
-```json
-{
-  "samples": [
-    [0.1, 0.2, 0.3, ...],
-    [0.2, 0.3, 0.4, ...],
-    [0.3, 0.4, 0.5, ...]
-  ]
-}
-```
-
-**Response:**
-```json
-{
-  "predictions": [
-    {"sign": "HELLO", "confidence": 0.98},
-    {"sign": "THANK", "confidence": 0.95},
-    {"sign": "YES", "confidence": 0.97}
-  ],
-  "inference_time_ms": 45
-}
-```
-
-### Model Information
-```http
-GET /model-info
-```
-
-Returns detailed model metadata.
-
-**Response:**
-```json
-{
-  "model_name": "sign_classifier_v1",
-  "version": "1.0.0",
-  "architecture": "Dense Neural Network",
-  "input_shape": [63],
-  "output_shape": [11],
-  "supported_signs": [
-    "BEST", "DISLIKE", "HELLO", "NO", "OK",
-    "PEACE", "ROCK", "SORRY", "THANK", "YES", "YOU"
-  ],
-  "accuracy": 0.9532,
-  "training_date": "2025-11-20",
-  "framework": "TensorFlow 2.12"
+  "label": "HELLO",
+  "index": 2,
+  "probs": [0.98, 0.01, 0.01, ...]
 }
 ```
 
@@ -295,7 +246,7 @@ Dense Layer 2 (128 units, ReLU)
     ↓
 Dropout (0.2)
     ↓
-Output Layer (11 units, Softmax)
+Output Layer (9 units, Softmax)
     ↓
 Output (Sign Probabilities)
 ```
@@ -309,7 +260,7 @@ model = Sequential([
     Dropout(0.3),
     Dense(128, activation='relu'),
     Dropout(0.2),
-    Dense(11, activation='softmax')  # 11 sign classes
+    Dense(9, activation='softmax')  # 9 sign classes
 ])
 
 # Compilation
@@ -337,12 +288,14 @@ model.fit(
 **Input**: 21 hand landmarks × 3 coordinates (x, y, z) = 63 features
 
 **Preprocessing**:
+
 1. Extract hand landmarks from video frames
 2. Normalize coordinates (0-1 range)
 3. Apply feature scaling (StandardScaler)
 4. Generate shape-based features
 
 **Sample Features**:
+
 ```
 Index 0-20:    Landmark X coordinates
 Index 21-41:   Landmark Y coordinates
@@ -351,11 +304,11 @@ Index 42-62:   Landmark Z coordinates
 
 ### Model Files
 
-| File | Size | Purpose |
-|------|------|---------|
-| `sign_model.h5` | ~20MB | Trained Keras model with weights |
-| `scaler.pkl` | ~5KB | Feature normalization scaler |
-| `label_map.json` | ~1KB | Sign class mappings |
+| File             | Size  | Purpose                          |
+| ---------------- | ----- | -------------------------------- |
+| `sign_model.h5`  | ~20MB | Trained Keras model with weights |
+| `scaler.pkl`     | ~5KB  | Feature normalization scaler     |
+| `label_map.json` | ~1KB  | Sign class mappings              |
 
 ### Label Mapping
 
@@ -369,9 +322,7 @@ Index 42-62:   Landmark Z coordinates
   "5": "PEACE",
   "6": "ROCK",
   "7": "SORRY",
-  "8": "THANK",
-  "9": "YES",
-  "10": "YOU"
+  "8": "YES"
 }
 ```
 
@@ -380,6 +331,7 @@ Index 42-62:   Landmark Z coordinates
 ### Inference Speed
 
 **Average Response Times** (tested on MacBook Pro M1):
+
 - Single prediction: 20-30ms
 - Batch of 10: 50-70ms
 - Batch of 100: 200-250ms
@@ -393,6 +345,7 @@ Index 42-62:   Landmark Z coordinates
 ### Optimization Techniques
 
 1. **Model Quantization** (future)
+
    ```python
    converter = tf.lite.TFLiteConverter.from_saved_model(saved_model)
    converter.optimizations = [tf.lite.Optimize.DEFAULT]
@@ -400,9 +353,10 @@ Index 42-62:   Landmark Z coordinates
    ```
 
 2. **Input Caching**
+
    ```python
    from functools import lru_cache
-   
+
    @lru_cache(maxsize=1000)
    def predict_cached(features_tuple):
        return model.predict(np.array([features_tuple]))
@@ -469,33 +423,31 @@ async def predict(request: PredictRequest):
 ### Dependencies
 
 ```
-tensorflow==2.12.0
-fastapi==0.100.1
+fastapi==0.104.1
 uvicorn==0.24.0
-numpy==1.24.3
-scikit-learn==1.3.2
 pydantic==2.5.0
 python-multipart==0.0.6
+numpy>=1.26.0
+scikit-learn>=1.3.2
+anyio>=3.7.1
+
+# Install TensorFlow separately
+# Windows/Linux CPU: tensorflow==2.13.0
+# Apple Silicon: tensorflow-macos==2.13.0
 ```
 
 ## 🧪 Testing
 
 ### Manual Testing
 
-```bash
-# Health check
-curl http://localhost:8001/health
+```bat
+rem Status
+curl http://localhost:8001/
 
-# Predict
-curl -X POST http://localhost:8001/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "features": [0.1, 0.2, 0.3, ...],
-    "confidence_threshold": 0.5
-  }'
-
-# Model info
-curl http://localhost:8001/model-info
+rem Predict
+curl -X POST http://localhost:8001/api/predict ^
+  -H "Content-Type: application/json" ^
+  -d "{\"features\":[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]}"
 ```
 
 ### Automated Testing
@@ -524,24 +476,25 @@ def test_predict():
 ```
 
 Run tests:
-```bash
+
+```bat
 pip install pytest
 pytest test_ml_server.py -v
 ```
 
 ## 🔍 Troubleshooting
 
-### Port Already in Use
+### Port Already in Use (Windows)
 
-```bash
-# Find process
-lsof -i :8001
+```bat
+rem Find process
+netstat -ano | findstr :8001
 
-# Kill process
-kill -9 <PID>
+rem Kill process
+taskkill /PID <PID> /F
 
-# Use different port
-python3 -m uvicorn main:app --port 8002
+rem Use different port
+py -3.11 -m uvicorn main:app --port 8002
 ```
 
 ### Model File Not Found
@@ -562,12 +515,14 @@ ls -lh model/
 # Upgrade pip first
 pip install --upgrade pip
 
-# Install TensorFlow
-pip install tensorflow==2.12.0
+# Install TensorFlow (Linux/Windows)
+pip install tensorflow==2.13.0
 
-# For M1/M2 Mac
-pip install tensorflow-macos tensorflow-metal
+# For Apple Silicon (M1/M2/M3)
+pip install tensorflow-macos==2.13.0
 ```
+
+> **Important**: Python 3.13 is NOT compatible with TensorFlow. Use Python 3.11.
 
 ### Out of Memory (OOM) Errors
 
@@ -598,17 +553,12 @@ model.summary()
 
 ### Backend Connection Issues
 
-```bash
-# Test connectivity
-curl http://localhost:8001/health
+```bat
+rem Test ML server status
+curl http://localhost:8001/
 
-# Check if backend can reach ML server
-curl -X POST http://localhost:8000/api/translate \
-  -H "Content-Type: application/json" \
-  -d '{"text": "hello"}'
-
-# If it fails, ensure both servers are running
-# Start them: python3 start_servers.py
+rem If backend cannot reach ML server, ensure both servers are running
+py -3.11 start_servers.py
 ```
 
 ## 📚 Additional Resources
@@ -637,6 +587,7 @@ MIT License - See [../LICENSE](../LICENSE)
 
 ---
 
-**Last Updated**: December 15, 2025  
-**Version**: 1.0.0  
-**ML Framework**: TensorFlow 2.12+
+**Last Updated**: December 17, 2025  
+**Version**: 1.2.0  
+**ML Framework**: TensorFlow 2.13.x  
+**Maintainer**: XXXXXXXXXX

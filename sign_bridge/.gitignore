@@ -43,3 +43,78 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# ============== SENSITIVE FILES ==============
+
+# Environment variables & secrets
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+*.env
+
+# API keys and secrets
+secrets.dart
+secrets.json
+api_keys.dart
+config.local.dart
+
+# Android signing keys
+*.jks
+*.keystore
+key.properties
+android/key.properties
+android/app/*.keystore
+android/app/*.jks
+
+# iOS sensitive files
+ios/Runner/GoogleService-Info.plist
+ios/*.p12
+ios/*.cer
+ios/*.mobileprovision
+ios/AuthKey_*.p8
+ios/fastlane/report.xml
+ios/fastlane/Preview.html
+ios/fastlane/screenshots
+ios/fastlane/test_output
+
+# Firebase config (may contain API keys)
+# Uncomment if you want to exclude these:
+# android/app/google-services.json
+# ios/Runner/GoogleService-Info.plist
+# ios/firebase_app_id_file.json
+
+# Local configuration
+android/local.properties
+local.properties
+
+# Gradle
+.gradle/
+android/.gradle/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Crashlytics
+crashlytics-build.properties
+
+# Pod lock (optional - some prefer to commit this)
+# ios/Podfile.lock
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Test coverage
+coverage/
+*.lcov
+
+# Logs and databases
+*.log
+*.sqlite
+*.db

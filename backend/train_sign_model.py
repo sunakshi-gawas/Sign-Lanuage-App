@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 from typing import Dict, Tuple, List
 from pathlib import Path
@@ -11,7 +12,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Input, Dropout, BatchNormalization
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, Callback, ProgbarLogger
 from tensorflow.keras.regularizers import l2
 
 # ================== CONFIG ==================
@@ -32,9 +33,9 @@ SCALER_PATH = MODEL_DIR / "scaler.pkl"
 TEST_SIZE = 0.15
 VAL_SIZE = 0.15
 RANDOM_STATE = 42
-EPOCHS = 100
-BATCH_SIZE = 16
-LEARNING_RATE = 0.001
+EPOCHS = 150  # More epochs for better training
+BATCH_SIZE = 32  # Larger batch for stability
+LEARNING_RATE = 0.0005  # Lower LR for better convergence
 
 # ===========================================
 
@@ -138,25 +139,59 @@ def load_data() -> Tuple[np.ndarray, np.ndarray, Dict[int, str], object]:
     return X, y_encoded, index_to_label, scaler
 
 
+# Custom progress bar callback
+class TrainingProgressCallback(Callback):
+    def __init__(self, epochs):
+        super().__init__()
+        self.epochs = epochs
+        
+    def on_epoch_begin(self, epoch, logs=None):
+        self.current_epoch = epoch + 1
+        
+    def on_epoch_end(self, epoch, logs=None):
+        loss = logs.get('loss', 0)
+        acc = logs.get('accuracy', 0)
+        val_loss = logs.get('val_loss', 0)
+        val_acc = logs.get('val_accuracy', 0)
+        
+        # Progress bar
+        progress = (epoch + 1) / self.epochs
+        bar_length = 30
+        filled = int(bar_length * progress)
+        bar = '█' * filled + '░' * (bar_length - filled)
+        
+        print(f"\r[{bar}] Epoch {epoch+1}/{self.epochs} | "
+              f"Loss: {loss:.4f} | Acc: {acc:.2%} | "
+              f"Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.2%}", end='')
+        
+        if epoch + 1 == self.epochs or logs.get('early_stop', False):
+            print()  # New line at the end
+
+
 def build_model(input_dim: int, num_classes: int) -> Sequential:
     """
     Build improved model with dropout, batch normalization, and L2 regularization.
+    Deeper network for better feature extraction.
     """
     model = Sequential([
         Input(shape=(input_dim,)),
-        Dense(256, activation="relu", kernel_regularizer=l2(0.001)),
+        Dense(512, activation="relu", kernel_regularizer=l2(0.0005)),
+        BatchNormalization(),
+        Dropout(0.4),
+        
+        Dense(256, activation="relu", kernel_regularizer=l2(0.0005)),
+        BatchNormalization(),
+        Dropout(0.4),
+        
+        Dense(128, activation="relu", kernel_regularizer=l2(0.0005)),
         BatchNormalization(),
         Dropout(0.3),
         
-        Dense(128, activation="relu", kernel_regularizer=l2(0.001)),
-        BatchNormalization(),
-        Dropout(0.3),
-        
-        Dense(64, activation="relu", kernel_regularizer=l2(0.001)),
+        Dense(64, activation="relu", kernel_regularizer=l2(0.0005)),
         BatchNormalization(),
         Dropout(0.2),
         
-        Dense(32, activation="relu", kernel_regularizer=l2(0.001)),
+        Dense(32, activation="relu"),
         Dropout(0.2),
         
         Dense(num_classes, activation="softmax"),
@@ -199,18 +234,27 @@ def main():
     # Callbacks for better training
     early_stop = EarlyStopping(
         monitor="val_accuracy",
-        patience=15,
+        patience=20,
         restore_best_weights=True,
-        verbose=1
+        verbose=0
     )
     
     reduce_lr = ReduceLROnPlateau(
-        monitor="val_accuracy",
+        monitor="val_loss",
         factor=0.5,
-        patience=5,
-        min_lr=0.00001,
-        verbose=1
+        patience=8,
+        min_lr=0.000001,
+        verbose=0
     )
+    
+    progress_callback = TrainingProgressCallback(EPOCHS)
+    
+    print("\n" + "="*60)
+    print("🚀 TRAINING STARTED")
+    print("="*60)
+    print(f"Training on {len(np.unique(y_encoded))} sign(s): {list(index_to_label.values())}")
+    print(f"Total samples: {X.shape[0]} | Train: {X_train.shape[0]} | Val: {X_val.shape[0]} | Test: {X_test.shape[0]}")
+    print("="*60 + "\n")
 
     history = model.fit(
         X_train,
@@ -218,9 +262,13 @@ def main():
         validation_data=(X_val, y_val),
         epochs=EPOCHS,
         batch_size=BATCH_SIZE,
-        callbacks=[early_stop, reduce_lr],
-        verbose=1,
+        callbacks=[early_stop, reduce_lr, progress_callback],
+        verbose=0,  # Disable default output, use our progress bar
     )
+    
+    print("\n" + "="*60)
+    print("✅ TRAINING COMPLETED")
+    print("="*60)
 
     # Evaluate on test set
     test_loss, test_accuracy = model.evaluate(X_test, y_test, verbose=0)

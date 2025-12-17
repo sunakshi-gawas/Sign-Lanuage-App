@@ -1,6 +1,6 @@
 # Backend API Server
 
-FastAPI-based REST API server for the SignVerse AI sign language recognition system. Handles sign translation, API routing, and ML model inference requests.
+FastAPI-based REST API server for the SignVerse AI sign language recognition system. Provides Sign→Text and Text→Sign APIs, serves sign GIF assets, and integrates with the external ML inference server.
 
 ## 📋 Table of Contents
 
@@ -19,6 +19,7 @@ FastAPI-based REST API server for the SignVerse AI sign language recognition sys
 ## 🎯 Overview
 
 The backend server is built with **FastAPI** and **Uvicorn**, providing:
+
 - RESTful API for sign language recognition
 - Text-to-sign translation via ML server
 - GIF/animation retrieval for detected signs
@@ -27,17 +28,19 @@ The backend server is built with **FastAPI** and **Uvicorn**, providing:
 - Error handling and validation
 
 ### Key Technologies
-- **Framework**: FastAPI 0.100+
+
+- **Framework**: FastAPI 0.104.1
 - **Server**: Uvicorn
-- **Language**: Python 3.9+
-- **Validation**: Pydantic
-- **ML Integration**: TensorFlow via separate ML server
+- **Language**: Python 3.11 (recommended)
+- **Validation**: Pydantic 2.5.0
+- **Hand Tracking**: cvzone + MediaPipe
+- **ML Integration**: External ML server (`ml_server`) via HTTP
 
 ## ✨ Features
 
-- 🔍 Sign recognition from video frames
+- 🔍 Sign→Text from feature vectors or camera images (via external ML server)
 - 🎯 Real-time API responses
-- 📚 Sign GIF/animation library
+- 📚 Text→Sign using GIF library lookup
 - 🌐 CORS-enabled for mobile integration
 - 📊 Health check endpoints
 - ⚡ Async request handling
@@ -51,80 +54,64 @@ The backend server is built with **FastAPI** and **Uvicorn**, providing:
 ```
 backend/
 │
-├── 📚 Documentation
-│   ├── README.md                    # This file
-│   ├── API.md                       # Detailed API documentation
-│   └── ARCHITECTURE.md              # Architecture details
+├── app/                            # FastAPI Application
+│   ├── __init__.py                 # Package initialization
+│   ├── main.py                     # FastAPI routes & app entry
+│   ├── schemas.py                  # Pydantic request/response models
+│   └── services/                   # Business logic services
+│       ├── __init__.py
+│       ├── sign_classifier.py      # Calls external ML server
+│       ├── text_to_sign.py         # Text→Sign GIF lookup utilities
+│       ├── translator.py           # Simple text translation helper
+│       └── label_map.json          # Sign labels mapping (if needed)
 │
-├── 🚀 Server Files
-│   ├── app/
-│   │   ├── __init__.py             # Package initialization
-│   │   ├── main.py                 # FastAPI application & routes
-│   │   ├── schemas.py              # Pydantic models for validation
-│   │   └── services/               # Business logic
-│   │       ├── __init__.py
-│   │       ├── sign_classifier.py  # Sign classification logic
-│   │       ├── text_to_sign.py     # Text translation to sign
-│   │       ├── sign_model.h5       # Trained ML model
-│   │       ├── sign_model.tflite   # TFLite model for mobile
-│   │       └── label_map.json      # Sign labels mapping
-│   │
-│   └── start_servers.py            # Server startup script (at root)
+├── data/                           # Training dataset (hand landmarks)
+│   ├── BEST/ ...                   # Sign samples
+│   └── ...
 │
-├── 🤖 ML Training
-│   ├── train_sign_model.py         # Model training script
-│   ├── collect_dataset.py          # Data collection script
-│   ├── inspect_data.py             # Data inspection utility
-│   ├── plot_training_history.py    # Visualization script
-│   └── requirements.txt            # Python dependencies
+├── models/                         # Auxiliary model assets
+│   └── hand_landmarker.task        # Hand landmark model (MediaPipe)
 │
-├── 📊 Data
-│   ├── data/                       # Training dataset
-│   │   ├── BEST/                   # Sample frames
-│   │   ├── HELLO/
-│   │   ├── NO/
-│   │   ├── OK/
-│   │   ├── PEACE/
-│   │   ├── SORRY/
-│   │   ├── THANK/
-│   │   ├── YES/
-│   │   ├── YOU/
-│   │   ├── ROCK/
-│   │   └── DISLIKE/
-│   │
-│   ├── sign_gifs/                  # GIF assets for UI display
-│   └── training_plots/             # Training visualizations
+├── logs/                           # Server logs (optional)
 │
-├── 🔧 Configuration
-│   ├── requirements.txt            # Production dependencies
-│   ├── .gitignore                  # Git ignore patterns
-│   └── run_backend.sh              # Legacy startup script
+├── sign_gifs/                      # Animated GIFs for Text→Sign
+│   ├── HELLO.gif
+│   ├── PLEASE.gif
+│   ├── SORRY.gif
+│   ├── THANK_YOU.gif
+│   └── YES.gif
 │
-└── 🏗️ Virtual Environments
-    └── train_venv/                 # Training environment
-    └── venv/                       # Production environment
+├── training_plots/                 # Model training visualizations
+│
+├── collect_dataset.py
+├── train_sign_model.py
+├── inspect_data.py
+├── plot_training_history.py
+├── requirements.txt                # Python dependencies
+├── README.md                       # This file
 ```
 
 ## 🚀 Setup & Installation
 
 ### Prerequisites
 
-- Python 3.9 or higher
+- Python 3.11
 - pip package manager
 - Virtual environment tool (venv)
 - 500MB disk space for models and data
 
 ### Quick Start
 
-The easiest way is to use the root startup script:
+The easiest way is to use the root startup script (Windows `cmd.exe`):
 
-```bash
-cd /path/to/Sign-Language
-python3 start_servers.py
+```bat
+cd d:\Sign-Language-App\Sign-Language-App
+py -3.11 start_servers.py
 ```
 
 This automatically:
-- Creates virtual environment if needed
+
+- Creates virtual environments if needed
 - Installs dependencies
 - Starts backend on port 8000
 - Starts ML server on port 8001
@@ -132,20 +119,23 @@ This automatically:
 ### Manual Setup
 
 **1. Create Virtual Environment**
-```bash
+
+```bat
 cd backend
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+py -3.11 -m venv venv
+venv\Scripts\activate
 ```
 
 **2. Install Dependencies**
-```bash
+
+```bat
 pip install -r requirements.txt
 ```
 
 **3. Run Server**
-```bash
-python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+```bat
+py -3.11 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 The `--reload` flag enables hot-reload for development.
@@ -154,90 +144,126 @@ The `--reload` flag enables hot-reload for development.
 
 ### Development Mode
 
-```bash
-python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```bat
+py -3.11 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### Production Mode
 
-```bash
-python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+```bat
+py -3.11 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
 ### Check Server Status
 
-```bash
-# Health check
+```bat
+rem Health check
 curl http://localhost:8000/api/health
 
-# View API docs
-# Open: http://localhost:8000/docs
+rem View API docs
+rem Open: http://localhost:8000/docs
 ```
 
 ## 🔌 API Endpoints
 
 ### Health Check
+
 ```http
 GET /api/health
 ```
-Returns server status and version.
+
+Returns quick server status.
 
 **Response:**
+
 ```json
 {
-  "status": "ok",
-  "version": "1.0.0",
-  "timestamp": "2025-12-15T10:30:00Z"
+  "status": "healthy",
+  "service": "SignVerse AI"
 }
 ```
 
-### Get Sign GIF
+### Serve Sign GIF
+
 ```http
-GET /sign_gifs/{sign_name}
+GET /sign_gifs/{file}.gif
 ```
-Returns animated GIF for a detected sign.
 
-**Parameters:**
-- `sign_name` (string): Sign name (e.g., "HELLO", "THANK", "YES")
-
-**Response:**
-- Content-Type: `image/gif`
-- Binary GIF data
+Returns animated GIF asset for a given token.
 
 **Example:**
-```bash
-curl http://localhost:8000/sign_gifs/HELLO --output hello.gif
+
+```bat
+curl http://localhost:8000/sign_gifs/HELLO.gif --output hello.gif
 ```
 
-### Translate Text to Sign
+### Sign→Text (features)
+
 ```http
-POST /api/translate
+POST /api/sign-to-text
 ```
-Converts text to sign language sequence.
 
-**Request:**
+Classify a sign from a 63-dim feature vector (flattened 21 hand landmarks).
+
+**Request (SignToTextRequest):**
+
 ```json
 {
-  "text": "hello",
+  "features": [0.1, -0.2, 0.05, ...],
   "language": "en"
 }
 ```
 
-**Response:**
+**Response (SignToTextResponse):**
+
 ```json
 {
-  "original_text": "hello",
-  "signs": ["HELLO"],
-  "confidence": 0.98,
-  "timestamp": "2025-12-15T10:30:00Z"
+  "text": "Hello",
+  "confidence": 0.92
 }
 ```
 
-**Example:**
-```bash
-curl -X POST http://localhost:8000/api/translate \
-  -H "Content-Type: application/json" \
-  -d '{"text": "hello", "language": "en"}'
+### Sign→Text (camera image)
+
+```http
+POST /api/sign-to-text-image?language=en
+```
+
+Classify a sign from a camera frame (binary image body, JPEG/PNG). Automatically detects the hand, extracts landmarks, and calls the ML server.
+
+**Response (SignToTextResponse):**
+
+```json
+{
+  "text": "Hello",
+  "confidence": 0.88
+}
+```
+
+### Text→Sign (GIF lookup)
+
+```http
+POST /api/text-to-sign
+```
+
+Tokenizes input text and returns available GIF URLs for each token.
+
+**Request (TextToSignRequest):**
+
+```json
+{
+  "text": "hello please",
+  "sign_language": "ISL"
+}
+```
+
+**Response (TextToSignResponse):**
+
+```json
+{
+  "sign_tokens": ["HELLO", "PLEASE"],
+  "avatar_animation_ids": ["/sign_gifs/HELLO.gif", "/sign_gifs/PLEASE.gif"]
+}
 ```
 
 ## ⚙️ Configuration
@@ -252,55 +278,64 @@ HOST=0.0.0.0
 PORT=8000
 DEBUG=false
 
-# ML Server
-ML_SERVER_URL=http://localhost:8001
+# ML Server (external inference)
+ML_SERVER_URL=http://127.0.0.1:8001/api/predict
+CONF_THRESHOLD=0.15
 
 # CORS
 CORS_ORIGINS=["http://localhost:3000","http://10.0.2.2:8000"]
 
-# Logging
+# Logging (optional)
 LOG_LEVEL=INFO
-LOG_FILE=/tmp/backend.log
-
-# Model
-MODEL_PATH=./app/services/sign_model.h5
-LABEL_MAP_PATH=./app/services/label_map.json
+LOG_FILE=./logs/backend.log
 ```
 
 ### Dependencies (requirements.txt)
 
 ```
-fastapi==0.100.1
-uvicorn==0.24.0
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
 pydantic==2.5.0
-pydantic-settings==2.1.0
 python-multipart==0.0.6
-aiofiles==23.2.1
-pillow==10.1.0
-numpy==1.24.3
-tensorflow==2.12.0
-requests==2.31.0
+
+# Data & ML
+numpy>=1.26.0
+opencv-python>=4.8.0
+mediapipe==0.10.14
+scikit-learn==1.8.0
+cvzone==1.6.1
+
+# API & networking
+requests>=2.31.0
+anyio>=3.7.1
+
+# Optional
+gTTS>=2.4.0
 ```
 
 ## 💾 Database & Storage
 
 ### Current Setup
-The backend uses file-based storage for:
-- **Models**: `app/services/sign_model.h5` (Keras)
-- **Labels**: `app/services/label_map.json` (JSON mapping)
+
+The backend uses:
+
+- **External ML**: `ml_server` for predictions (`/api/predict`)
+- **Hand assets**: `models/hand_landmarker.task`
 - **GIFs**: `sign_gifs/` directory
-- **Logs**: `/tmp/backend.log`
+- **Logs**: `logs/backend.log`
 
 ### Scaling Considerations
 
 For production deployment:
 
 1. **Database**: Add PostgreSQL or MongoDB for
+
    - User history
    - Translation logs
    - Analytics
 
 2. **Object Storage**: Use S3/Cloud Storage for
+
    - GIF files
    - Model files
    - Training datasets
@@ -315,29 +350,36 @@ For production deployment:
 ### Project Structure
 
 ```python
-# app/main.py - Main FastAPI application
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-app = FastAPI(title="SignVerse API")
-
-# CORS configuration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app/main.py - Key endpoints
 
 @app.get("/api/health")
-async def health_check():
-    return {"status": "ok"}
+def health_check():
+  return {"status": "healthy", "service": "SignVerse AI"}
+
+@app.post("/api/sign-to-text")
+def sign_to_text(req: SignToTextRequest):
+  label, conf = classifier.predict(req.features)
+  text = label_to_text(label)
+  if req.language and req.language != "en":
+    text = translate_text(text, req.language)
+  return SignToTextResponse(text=text, confidence=float(conf))
+
+@app.post("/api/sign-to-text-image")
+async def sign_to_text_image(request: Request):
+  # decode image bytes, detect hand, extract landmarks, call ML server
+  ...
+
+@app.post("/api/text-to-sign")
+def text_to_sign(req: TextToSignRequest):
+  tokens = text_to_tokens(req.text)
+  urls = [token_to_gif_url(t) for t in tokens if token_to_gif_url(t)]
+  return TextToSignResponse(sign_tokens=tokens, avatar_animation_ids=urls)
 ```
 
 ### Adding New Endpoints
 
 1. Define request/response models in `schemas.py`:
+
 ```python
 from pydantic import BaseModel
 
@@ -347,6 +389,7 @@ class SignRequest(BaseModel):
 ```
 
 2. Create service method in `services/sign_classifier.py`:
+
 ```python
 async def classify_sign(sign_name: str):
     # Implementation
@@ -354,6 +397,7 @@ async def classify_sign(sign_name: str):
 ```
 
 3. Add route in `app/main.py`:
+
 ```python
 @app.post("/api/classify")
 async def classify(request: SignRequest):
@@ -364,6 +408,7 @@ async def classify(request: SignRequest):
 ### Code Style
 
 Follow PEP 8:
+
 ```bash
 # Format code
 pip install black
@@ -384,17 +429,22 @@ mypy app/
 
 Test endpoints with curl:
 
-```bash
-# Health check
+```bat
+rem Health check
 curl http://localhost:8000/api/health
 
-# Test translation
-curl -X POST http://localhost:8000/api/translate \
-  -H "Content-Type: application/json" \
-  -d '{"text": "hello world", "language": "en"}'
+rem Sign→Text (features)
+curl -X POST http://localhost:8000/api/sign-to-text ^
+  -H "Content-Type: application/json" ^
+  -d "{\"features\":[0.1,0.2,0.3],\"language\":\"en\"}"
 
-# Get sign GIF
-curl http://localhost:8000/sign_gifs/HELLO -o sign.gif
+rem Text→Sign (GIF lookup)
+curl -X POST http://localhost:8000/api/text-to-sign ^
+  -H "Content-Type: application/json" ^
+  -d "{\"text\":\"hello please\"}"
+
+rem Get sign GIF
+curl http://localhost:8000/sign_gifs/HELLO.gif -o hello.gif
 ```
 
 ### Automated Testing
@@ -409,79 +459,88 @@ from app.main import app
 client = TestClient(app)
 
 def test_health_check():
-    response = client.get("/api/health")
-    assert response.status_code == 200
-    assert response.json()["status"] == "ok"
+  response = client.get("/api/health")
+  assert response.status_code == 200
+  data = response.json()
+  assert data["status"] == "healthy"
 
-def test_translate():
-    response = client.post("/api/translate", json={
-        "text": "hello",
-        "language": "en"
-    })
-    assert response.status_code == 200
-    assert "signs" in response.json()
+def test_text_to_sign():
+  response = client.post("/api/text-to-sign", json={
+    "text": "hello"
+  })
+  assert response.status_code == 200
+  data = response.json()
+  assert "sign_tokens" in data
+  assert "avatar_animation_ids" in data
 ```
 
 Run tests:
-```bash
+
+```bat
 pip install pytest pytest-asyncio
 pytest test_api.py -v
 ```
 
 ## 🔍 Troubleshooting
 
-### Port Already in Use
+### Port Already in Use (Windows)
 
-```bash
-# Find process using port 8000
-lsof -i :8000
+```bat
+rem Find process using port 8000
+netstat -ano | findstr :8000
 
-# Kill the process
-kill -9 <PID>
+rem Kill the process
+taskkill /PID <PID> /F
 
-# Or use different port
-python3 -m uvicorn app.main:app --port 8001
+rem Or use different port
+py -3.11 -m uvicorn app.main:app --port 8001
 ```
 
 ### Module Not Found Errors
 
-```bash
-# Ensure virtual environment is activated
-source venv/bin/activate
+```bat
+rem Ensure virtual environment is activated
+venv\Scripts\activate
 
-# Reinstall dependencies
+rem Reinstall dependencies
 pip install -r requirements.txt
 
-# Check PYTHONPATH
-export PYTHONPATH="${PYTHONPATH}:/path/to/backend"
+rem Check PYTHONPATH (Windows)
+set PYTHONPATH=%PYTHONPATH%;d:\Sign-Language-App\Sign-Language-App\backend
 ```
 
-### TensorFlow Issues on M1/M2 Mac
+### ML Server Connection Issues
 
-```bash
-# Use conda instead
-conda create -n signverse python=3.10
-conda activate signverse
-conda install -c apple tensorflow-deps
-pip install tensorflow-macos tensorflow-metal
+```bat
+rem Check if ML server is running
+curl http://localhost:8001/health
+
+rem Test prediction endpoint
+curl -X POST http://localhost:8001/api/predict ^
+  -H "Content-Type: application/json" ^
+  -d "{\"features\":[0.1,0.2,0.3]}"
+
+rem Check backend logs
+type .\logs\backend.log
 ```
 
 ### Model File Not Found
 
-```bash
-# Verify model exists
-ls -lh app/services/sign_model.h5
+```bat
+rem Verify GIF assets exist
+dir sign_gifs
 
-# Check file permissions
-chmod 644 app/services/sign_model.h5
+rem Verify hand asset
+dir models\hand_landmarker.task
 
-# Verify label map
-cat app/services/label_map.json
+rem Verify label map (optional)
+type app\services\label_map.json
 ```
 
 ### CORS Errors from Mobile App
 
 Update `app/main.py`:
+
 ```python
 app.add_middleware(
     CORSMiddleware,
@@ -531,6 +590,6 @@ MIT License - See [../LICENSE](../LICENSE)
 
 ---
 
-**Last Updated**: December 15, 2025  
-**Version**: 1.0.0  
-**Maintainer**: SignVerse AI Team
+**Last Updated**: December 17, 2025  
+**Version**: 1.2.0  
+**Maintainer**: XXXXXXXXXX
