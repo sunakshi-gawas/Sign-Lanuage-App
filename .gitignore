@@ -1,0 +1,6 @@
+venv/ 
+backend/venv/ 
+ml_server/venv_infer/ 
+__pycache__/ 
+*.pyc 
+.DS_Store 
