@@ -362,7 +362,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 👥 Authors
 
-- **\*\*\*\***\_\_\_\_**\*\*\*\*** - Main Developer
+Sunakshi Gawas - Main Developer
 
 ## 🙏 Acknowledgments
 
