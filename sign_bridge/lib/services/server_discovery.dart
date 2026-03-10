@@ -19,7 +19,7 @@ class ServerDiscovery {
   /// Returns the discovered or fallback server URL.
   /// Works on any network by scanning the local subnet.
   static Future<String> getServerUrl({
-    String fallbackUrl = 'http://127.0.0.1:8000',
+    String fallbackUrl = 'http://172.20.19.197:8000',
   }) async {
     // Return cached discovery result if available
     if (_discoveryAttempted) {

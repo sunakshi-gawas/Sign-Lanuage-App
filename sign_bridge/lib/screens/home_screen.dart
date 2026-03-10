@@ -2,8 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-import 'sign_to_text_screen_v2.dart';
-import 'text_to_sign_screen.dart';
+import 'talk_with_ai_screen.dart';
 import '../theme/app_theme.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -21,22 +20,22 @@ class HomeScreen extends StatelessWidget {
             children: [
               // ---------- HEADER WITH LOGO ----------
               const _HeaderSection(),
-              
+
               const SizedBox(height: 32),
-              
+
               // ---------- HERO SECTION ----------
               const _HeroSection(),
-              
+
               const SizedBox(height: 28),
-              
-              // ---------- FEATURE CHIPS ----------
-              const _FeatureChipsSection(),
-              
-              const SizedBox(height: 32),
-              
+
               // ---------- ACTION CARDS ----------
               const _ActionCardsSection(),
-              
+
+              const SizedBox(height: 32),
+
+              // ---------- FEATURE CHIPS ----------
+              const _FeatureChipsSection(),
+
               const SizedBox(height: 24),
             ],
           ),
@@ -63,7 +62,9 @@ class _HeaderSectionState extends State<_HeaderSection> {
   void initState() {
     super.initState();
     _checkConnectivity();
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen(_updateConnectionStatus);
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen(
+      _updateConnectionStatus,
+    );
   }
 
   Future<void> _checkConnectivity() async {
@@ -73,7 +74,8 @@ class _HeaderSectionState extends State<_HeaderSection> {
 
   void _updateConnectionStatus(List<ConnectivityResult> result) {
     setState(() {
-      _isOnline = result.isNotEmpty && !result.contains(ConnectivityResult.none);
+      _isOnline =
+          result.isNotEmpty && !result.contains(ConnectivityResult.none);
     });
   }
 
@@ -104,15 +106,12 @@ class _HeaderSectionState extends State<_HeaderSection> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              'assets/logo.png',
-              fit: BoxFit.contain,
-            ),
+            child: Image.asset('assets/logo.png', fit: BoxFit.contain),
           ),
         ),
-        
+
         const SizedBox(width: 14),
-        
+
         // App name and tagline
         Expanded(
           child: Column(
@@ -139,17 +138,17 @@ class _HeaderSectionState extends State<_HeaderSection> {
             ],
           ),
         ),
-        
+
         // Status indicator
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: _isOnline 
+            color: _isOnline
                 ? AppColors.success.withOpacity(0.1)
                 : Colors.red.withOpacity(0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: _isOnline 
+              color: _isOnline
                   ? AppColors.success.withOpacity(0.3)
                   : Colors.red.withOpacity(0.3),
               width: 1,
@@ -195,9 +194,9 @@ class _HeroSection extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFF7C3AED),  // Deep purple matching logo
-            Color(0xFF8B5CF6),  // Purple
-            Color(0xFFA855F7),  // Light purple
+            Color(0xFF7C3AED), // Deep purple matching logo
+            Color(0xFF8B5CF6), // Purple
+            Color(0xFFA855F7), // Light purple
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -231,7 +230,10 @@ class _HeroSection extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
@@ -247,9 +249,9 @@ class _HeroSection extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           const Text(
             'Sign Language\nCommunication Bridge',
             style: TextStyle(
@@ -260,9 +262,9 @@ class _HeroSection extends StatelessWidget {
               letterSpacing: -0.5,
             ),
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           Text(
             'Connect sign language users with non-signers through real-time AI translation.',
             style: TextStyle(
@@ -271,26 +273,17 @@ class _HeroSection extends StatelessWidget {
               color: Colors.white.withOpacity(0.9),
             ),
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Stats row - use Wrap to prevent overflow
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              _StatChip(
-                icon: Icons.gesture_rounded,
-                label: '4+ Signs',
-              ),
-              _StatChip(
-                icon: Icons.speed_rounded,
-                label: 'Real-time',
-              ),
-              _StatChip(
-                icon: Icons.mic_rounded,
-                label: 'Voice',
-              ),
+              _StatChip(icon: Icons.gesture_rounded, label: '4+ Signs'),
+              _StatChip(icon: Icons.speed_rounded, label: 'Real-time'),
+              _StatChip(icon: Icons.mic_rounded, label: 'Voice'),
             ],
           ),
         ],
@@ -332,110 +325,53 @@ class _StatChip extends StatelessWidget {
   }
 }
 
-// ============== FEATURE CHIPS SECTION ==============
-
-class _FeatureChipsSection extends StatelessWidget {
-  const _FeatureChipsSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Features',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 14),
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 2.8,
-          children: const [
-            _FeatureChip(
-              icon: Icons.videocam_rounded,
-              title: 'Live Capture',
-              color: Color(0xFF7C3AED),  // Deep purple
-            ),
-            _FeatureChip(
-              icon: Icons.flip_camera_ios_rounded,
-              title: 'Camera Flip',
-              color: Color(0xFF8B5CF6),  // Purple
-            ),
-            _FeatureChip(
-              icon: Icons.animation_rounded,
-              title: 'Sign GIFs',
-              color: Color(0xFFF97316),  // Orange
-            ),
-            _FeatureChip(
-              icon: Icons.record_voice_over_rounded,
-              title: 'Text to Speech',
-              color: Color(0xFFEA580C),  // Dark orange
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _FeatureChip extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final Color color;
-
-  const _FeatureChip({
-    required this.icon,
-    required this.title,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border, width: 1),
-        boxShadow: AppShadows.small,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, size: 18, color: color),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // ============== ACTION CARDS SECTION ==============
 
-class _ActionCardsSection extends StatelessWidget {
+class _ActionCardsSection extends StatefulWidget {
   const _ActionCardsSection();
+
+  @override
+  State<_ActionCardsSection> createState() => _ActionCardsSectionState();
+}
+
+class _ActionCardsSectionState extends State<_ActionCardsSection>
+    with TickerProviderStateMixin {
+  late AnimationController _pulseController;
+  late AnimationController _scaleController;
+  late Animation<double> _pulseAnimation;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Pulse animation for glow effect
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 0.3, end: 0.6).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    // Scale animation for icon
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    _scaleController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -451,184 +387,309 @@ class _ActionCardsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
-        
-        // Sign to Text Card - Purple themed (matching logo hand)
-        _ActionCard(
-          title: 'Sign → Text & Voice',
-          subtitle: 'Show signs to camera and get instant text + voice translation',
-          icon: Icons.front_hand_rounded,
-          gradient: AppColors.signToTextCardGradient,
-          iconColor: const Color(0xFF7C3AED),  // Deep purple from logo
-          buttonLabel: 'Start Sign Recognition',
-          buttonColor: const Color(0xFF7C3AED),
-          onPressed: () {
+
+        // Animated Talk with SignVerse AI Card
+        GestureDetector(
+          onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const SignToTextScreenV2()),
+              MaterialPageRoute(builder: (_) => const TalkWithAIScreen()),
             );
           },
-        ),
-        
-        const SizedBox(height: 16),
-        
-        // Text to Sign Card - Orange themed (matching logo fingers)
-        _ActionCard(
-          title: 'Text → Sign Avatar',
-          subtitle: 'Type or speak a message and see it in sign language',
-          icon: Icons.record_voice_over_rounded,
-          gradient: AppColors.textToSignCardGradient,
-          iconColor: const Color(0xFFF97316),  // Orange from logo
-          buttonLabel: 'Open Text to Sign',
-          buttonColor: const Color(0xFFEA580C),  // Darker orange for button
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const TextToSignScreen()),
-            );
-          },
+          child: AnimatedBuilder(
+            animation: _pulseAnimation,
+            builder: (context, child) {
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFBAA4C),
+                      Color(0xFFF97316), // Orange
+                      Color(0xFFEA580C), // Dark orange
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(
+                        0xFFFB923C,
+                      ).withOpacity(_pulseAnimation.value),
+                      blurRadius: 25,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 20,
+                  ),
+                  child: Row(
+                    children: [
+                      // Animated Icon
+                      ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Animated rings
+                              AnimatedBuilder(
+                                animation: _pulseController,
+                                builder: (context, child) {
+                                  return Container(
+                                    width: 36 + (_pulseController.value * 18),
+                                    height: 36 + (_pulseController.value * 18),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: const Color(0xFFFB923C)
+                                            .withOpacity(
+                                              0.4 -
+                                                  (_pulseController.value *
+                                                      0.3),
+                                            ),
+                                        width: 2,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.asset(
+                                  'assets/logo.png',
+                                  width: 38,
+                                  height: 38,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 16),
+
+                      // Content
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'Talk with SignVerse AI',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'AI-powered sign language translation',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white.withOpacity(0.85),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Arrow icon with pulse
+                      AnimatedBuilder(
+                        animation: _pulseController,
+                        builder: (context, child) {
+                          return Transform.translate(
+                            offset: Offset(_pulseController.value * 3, 0),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: const Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 22,
+                                color: Colors.white,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ],
     );
   }
 }
 
-class _ActionCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final LinearGradient gradient;
-  final Color iconColor;
-  final String buttonLabel;
-  final Color buttonColor;
-  final VoidCallback onPressed;
+// ============== FEATURE CHIPS SECTION ==============
 
-  const _ActionCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.gradient,
-    required this.iconColor,
-    required this.buttonLabel,
-    required this.buttonColor,
-    required this.onPressed,
-  });
+class _FeatureChipsSection extends StatelessWidget {
+  const _FeatureChipsSection();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: iconColor.withOpacity(0.15),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: iconColor.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            // Icon
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    color: iconColor.withOpacity(0.15),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Icon(
-                icon,
-                size: 32,
-                color: iconColor,
+            const Text(
+              'Features',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
               ),
             ),
-            
-            const SizedBox(width: 16),
-            
-            // Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      height: 1.4,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  
-                  // Button
-                  GestureDetector(
-                    onTap: onPressed,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: buttonColor,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: buttonColor.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            buttonLabel,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          const Icon(
-                            Icons.arrow_forward_rounded,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF7C3AED).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                '4 capabilities',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF7C3AED),
+                ),
               ),
             ),
           ],
         ),
-      ),
+        const SizedBox(height: 16),
+
+        // Feature list with icons inline
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppColors.border.withOpacity(0.5),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              _FeatureRow(
+                icon: Icons.videocam_rounded,
+                title: 'Live Capture',
+                description: 'Real-time camera feed processing',
+                color: const Color(0xFF7C3AED),
+              ),
+              _buildDivider(),
+              _FeatureRow(
+                icon: Icons.flip_camera_ios_rounded,
+                title: 'Camera Flip',
+                description: 'Switch between front & back',
+                color: const Color(0xFF8B5CF6),
+              ),
+              _buildDivider(),
+              _FeatureRow(
+                icon: Icons.animation_rounded,
+                title: 'Sign GIFs',
+                description: 'Animated sign demonstrations',
+                color: const Color(0xFFF97316),
+              ),
+              _buildDivider(),
+              _FeatureRow(
+                icon: Icons.record_voice_over_rounded,
+                title: 'Text to Speech',
+                description: 'Voice output for translations',
+                color: const Color(0xFFEA580C),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDivider() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Divider(height: 1, color: AppColors.border.withOpacity(0.5)),
+    );
+  }
+}
+
+class _FeatureRow extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String description;
+  final Color color;
+
+  const _FeatureRow({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, size: 20, color: color),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                description,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary.withOpacity(0.8),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Icon(
+          Icons.check_circle_rounded,
+          size: 20,
+          color: color.withOpacity(0.6),
+        ),
+      ],
     );
   }
 }

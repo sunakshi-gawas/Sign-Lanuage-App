@@ -98,7 +98,11 @@ class _TextToSignScreenState extends State<TextToSignScreen> {
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.text_fields_rounded, size: 20, color: Colors.white),
+              child: const Icon(
+                Icons.text_fields_rounded,
+                size: 20,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(width: 10),
             const Text(
@@ -120,207 +124,228 @@ class _TextToSignScreenState extends State<TextToSignScreen> {
             // Input Section
             Container(
               margin: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Text Input
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
-                  child: TextField(
-                    controller: _controller,
-                    focusNode: _focusNode,
-                    decoration: InputDecoration(
-                      hintText: 'Type your message here...',
-                      hintStyle: TextStyle(
-                        color: AppColors.textMuted,
-                        fontSize: 14,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.edit_rounded,
-                        color: const Color(0xFFF97316),
-                        size: 20,
-                      ),
-                      filled: true,
-                      fillColor: AppColors.surface,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Color(0xFFF97316),
-                          width: 2,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // Text Input
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+                    child: TextField(
+                      controller: _controller,
+                      focusNode: _focusNode,
+                      decoration: InputDecoration(
+                        hintText: 'Type your message here...',
+                        hintStyle: TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 14,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.edit_rounded,
+                          color: const Color(0xFFF97316),
+                          size: 20,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.surface,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFF97316),
+                            width: 2,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
                         ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
-                      ),
+                      maxLines: 1,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _convert(),
                     ),
-                    maxLines: 1,
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (_) => _convert(),
                   ),
-                ),
 
-                // Convert Button
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: _loading
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFF97316), Color(0xFFEA580C)],
+                  // Convert Button
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: _loading
+                          ? Container(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFF97316),
+                                    Color(0xFFEA580C),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(14),
                               ),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: const Center(
-                              child: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2.5,
+                              child: const Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
                                 ),
                               ),
-                            ),
-                          )
-                        : Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFF97316), Color(0xFFEA580C)],
-                              ),
-                              borderRadius: BorderRadius.circular(14),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFFF97316).withOpacity(0.4),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 4),
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFF97316),
+                                    Color(0xFFEA580C),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: _convert,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  Icon(Icons.translate_rounded, color: Colors.white, size: 22),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Convert to Sign',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
+                                borderRadius: BorderRadius.circular(14),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFFF97316,
+                                    ).withOpacity(0.4),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
                                   ),
                                 ],
                               ),
+                              child: ElevatedButton(
+                                onPressed: _convert,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Icon(
+                                      Icons.translate_rounded,
+                                      color: Colors.white,
+                                      size: 22,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Convert to Sign',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Tokens Display
-          if (_signTokensText.isNotEmpty)
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF7C3AED).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: const Color(0xFF7C3AED).withOpacity(0.2),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF7C3AED),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.label_rounded,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      _signTokensText,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF7C3AED),
-                      ),
                     ),
                   ),
                 ],
               ),
             ),
 
-          const SizedBox(height: 16),
-
-          // Main GIF Display Area
-          Flexible(
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              decoration: BoxDecoration(
-                gradient: _gifPaths.isEmpty
-                    ? null
-                    : const LinearGradient(
-                        colors: [Color(0xFF7C3AED), Color(0xFFF97316)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                borderRadius: BorderRadius.circular(24),
-                color: _gifPaths.isEmpty ? AppColors.surface : null,
-                border: _gifPaths.isEmpty
-                    ? Border.all(color: AppColors.border, width: 1.5)
-                    : null,
-              ),
-              padding: _gifPaths.isEmpty ? EdgeInsets.zero : const EdgeInsets.all(3),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(_gifPaths.isEmpty ? 24 : 21),
+            // Tokens Display
+            if (_signTokensText.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
                 ),
-                child: _gifPaths.isEmpty
-                    ? _buildEmptyState()
-                    : _buildGifViewer(api),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF7C3AED).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFF7C3AED).withOpacity(0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF7C3AED),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.label_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _signTokensText,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF7C3AED),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            const SizedBox(height: 16),
+
+            // Main GIF Display Area
+            Flexible(
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                decoration: BoxDecoration(
+                  gradient: _gifPaths.isEmpty
+                      ? null
+                      : const LinearGradient(
+                          colors: [Color(0xFF7C3AED), Color(0xFFF97316)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                  borderRadius: BorderRadius.circular(24),
+                  color: _gifPaths.isEmpty ? AppColors.surface : null,
+                  border: _gifPaths.isEmpty
+                      ? Border.all(color: AppColors.border, width: 1.5)
+                      : null,
+                ),
+                padding: _gifPaths.isEmpty
+                    ? EdgeInsets.zero
+                    : const EdgeInsets.all(3),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(
+                      _gifPaths.isEmpty ? 24 : 21,
+                    ),
+                  ),
+                  child: _gifPaths.isEmpty
+                      ? _buildEmptyState()
+                      : _buildGifViewer(api),
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
@@ -361,10 +386,7 @@ class _TextToSignScreenState extends State<TextToSignScreen> {
                 child: Text(
                   'Type a message and tap Convert',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textMuted,
-                  ),
+                  style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                 ),
               ),
             ],
@@ -392,20 +414,22 @@ class _TextToSignScreenState extends State<TextToSignScreen> {
               final fullUrl = '${api.baseUrl}$relative';
 
               return Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(8),
                 child: Center(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: Image.network(
                       fullUrl,
                       fit: BoxFit.contain,
+                      width: double.infinity,
+                      height: double.infinity,
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return Center(
                           child: CircularProgressIndicator(
                             value: loadingProgress.expectedTotalBytes != null
                                 ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
+                                      loadingProgress.expectedTotalBytes!
                                 : null,
                             color: const Color(0xFF7C3AED),
                             strokeWidth: 3,
@@ -454,7 +478,10 @@ class _TextToSignScreenState extends State<TextToSignScreen> {
             children: [
               // Current sign label
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Color(0xFF7C3AED), Color(0xFF8B5CF6)],
@@ -563,10 +590,7 @@ class _TextToSignScreenState extends State<TextToSignScreen> {
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
                     '${_currentIndex + 1} of ${_gifPaths.length} signs',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                   ),
                 ),
             ],

@@ -117,7 +117,7 @@ cd backend
 py -3.11 -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
-py -3.11 -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
 **ML Server:**
@@ -128,8 +128,8 @@ py -3.11 -m venv venv_infer
 venv_infer\Scripts\activate
 pip install -r requirements.txt
 rem Install TensorFlow runtime if not present
-pip install tensorflow==2.13.0
-py -3.11 -m uvicorn main:app --host 0.0.0.0 --port 8001
+pip install tensorflow==2.18.0
+python -m uvicorn main:app --host 0.0.0.0 --port 8001
 ```
 
 **Flutter App:**

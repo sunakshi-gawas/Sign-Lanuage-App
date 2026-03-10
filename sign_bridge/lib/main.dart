@@ -39,15 +39,19 @@ class SignVerseApp extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: AppShadows.colored,
                       ),
-                      child: const Icon(
-                        Icons.sign_language_rounded,
-                        color: Colors.white,
-                        size: 40,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.asset(
+                          'assets/logo.png',
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
                     const CircularProgressIndicator(
-                      color: AppColors.primary,
+                      color: Color.fromARGB(255, 248, 248, 249),
                       strokeWidth: 3,
                     ),
                     const SizedBox(height: 16),
